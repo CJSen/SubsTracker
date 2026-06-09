@@ -17,7 +17,12 @@ function run(command) {
 }
 
 function listNamespaces() {
-  const output = run('npx wrangler kv namespace list');
+  let output = run('npx wrangler kv namespace list');
+  // 修复：wrangler 检测到代理时会输出日志到 stdout，导致 JSON.parse 失败
+  const jsonStart = output.indexOf('[');
+  if (jsonStart > -1) {
+    output = output.slice(jsonStart);
+  }
   const parsed = JSON.parse(output);
   return Array.isArray(parsed) ? parsed : [];
 }
